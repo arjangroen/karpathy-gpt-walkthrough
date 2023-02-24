@@ -1,5 +1,7 @@
 import os
 import torch
+from gpt_utils import get_batch
+from models import BigramLanguageModel
 
 if "Book 3 - The Prisoner of Azkaban.txt" not in os.listdir('.'):
     os.system("wget https://raw.githubusercontent.com/formcept/whiteboard/master/nbviewer/notebooks/data/harrypotter/Book%203%20-%20The%20Prisoner%20of%20Azkaban.txt")
@@ -31,5 +33,18 @@ print(encode("Harry Potter"))
 print(decode(encode("Harry Potter")))
 
 data = torch.tensor(encode(text), dtype=torch.long)
-print(data.shape, data.dtype)
-print(data.dtype)
+
+split = int(len(data) * 0.9)
+
+train = data[:split]
+test = data[split:]
+
+block_size = 8
+
+model = BigramLanguageModel(vocab_size=vocab_size)
+
+xb, yb = get_batch(train)
+
+logits, loss = model(xb, yb)
+
+
